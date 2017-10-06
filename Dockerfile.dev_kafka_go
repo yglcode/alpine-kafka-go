@@ -1,0 +1,40 @@
+FROM iron/go:dev
+
+ENV GRADLE_VERSION 2.12
+ENV GRADLE_HOME /usr/local/gradle
+ENV PATH ${PATH}:${GRADLE_HOME}/bin
+
+RUN apk update \
+    && apk add bash curl tar openjdk8 git sqlite \
+    && apk add --no-cache --virtual .build-deps ca-certificates make gcc g++ python zlib-dev openssl-dev cyrus-sasl-dev lz4-dev libc-dev bsd-compat-headers py-setuptools
+
+
+RUN apk update && apk add libsasl && rm -rf /var/cache/apk/*
+
+ADD https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip /usr/local/gradle.zip
+
+RUN cd /usr/local \
+    && unzip gradle.zip \
+    && ln -s gradle-$GRADLE_VERSION gradle
+
+WORKDIR /src
+
+ADD https://github.com/edenhill/librdkafka/archive/master.zip /src/librdkafka.zip
+
+RUN unzip librdkafka.zip \
+    && cd /src/librdkafka-master \
+    && ./configure \
+    && make \
+    && make install
+
+ADD https://github.com/edenhill/trivup/archive/master.zip /src/trivup.zip
+
+RUN unzip trivup.zip \
+    && cd /src/trivup-master \
+    && python setup.py install
+
+#COPY test.conf /src/librdkafka-master/tests/
+
+#RUN cd /src/librdkafka-master/tests \
+#    && make full
+
