@@ -1,13 +1,10 @@
-FROM iron/go
+FROM alpine:3.6
 
 RUN apk update && \
-    apk add  --no-cache --virtual .build-deps ca-certificates
-
-RUN apk add librdkafka-dev  --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
-
-RUN apk add musl libressl2.5-libcrypto libressl2.5-libssl && \
-    apk add cyrus-sasl lz4-dev
-
-#RUN apk add krb5 sqlite openssl pkgconf 
-
-RUN rm -rf /var/cache/apk/*
+    apk add  --no-cache ca-certificates bash curl && \
+\
+    apk add librdkafka --update-cache --repository http://nl.alpinelinux.org/alpine/edge/community && \
+\
+    apk add musl libressl2.5-libcrypto libressl2.5-libssl && \
+\
+    rm -rf /var/cache/apk/*

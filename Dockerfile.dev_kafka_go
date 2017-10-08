@@ -1,40 +1,23 @@
-FROM iron/go:dev
+FROM golang:1.9.1-alpine3.6
 
-ENV GRADLE_VERSION 2.12
-ENV GRADLE_HOME /usr/local/gradle
-ENV PATH ${PATH}:${GRADLE_HOME}/bin
-
-RUN apk update \
-    && apk add bash curl tar openjdk8 git sqlite \
-    && apk add --no-cache --virtual .build-deps ca-certificates make gcc g++ python zlib-dev openssl-dev cyrus-sasl-dev lz4-dev libc-dev bsd-compat-headers py-setuptools
-
-
-RUN apk update && apk add libsasl && rm -rf /var/cache/apk/*
-
-ADD https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip /usr/local/gradle.zip
-
-RUN cd /usr/local \
-    && unzip gradle.zip \
-    && ln -s gradle-$GRADLE_VERSION gradle
+RUN apk update && \
+    apk add --no-cache ca-certificates bash curl git make gcc g++ python zlib cyrus-sasl lz4 libsasl bsd-compat-headers py-setuptools
 
 WORKDIR /src
 
-ADD https://github.com/edenhill/librdkafka/archive/master.zip /src/librdkafka.zip
+RUN curl -sSL -O https://github.com/edenhill/librdkafka/archive/master.zip && \
+    unzip master.zip && \
+    cd /src/librdkafka-master && \
+    ./configure && \
+    make && \
+    make install && \
+    rm -fr /src/librdkafka-master /src/master.zip 
 
-RUN unzip librdkafka.zip \
-    && cd /src/librdkafka-master \
-    && ./configure \
-    && make \
-    && make install
-
-ADD https://github.com/edenhill/trivup/archive/master.zip /src/trivup.zip
-
-RUN unzip trivup.zip \
-    && cd /src/trivup-master \
-    && python setup.py install
-
-#COPY test.conf /src/librdkafka-master/tests/
-
-#RUN cd /src/librdkafka-master/tests \
-#    && make full
+RUN curl -sSL -O https://github.com/edenhill/trivup/archive/master.zip && \
+    unzip master.zip && \
+    cd /src/trivup-master && \
+    python setup.py install && \
+    rm -fr /src/master.zip /src/trivup-master && \
+\
+    rm -rf /var/cache/apk/*     
 
