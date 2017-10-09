@@ -1,0 +1,17 @@
+version: '3'
+services:
+  pinger:
+    build: .
+    image: ${MYHUB}/yglcode/pingpong:kafka
+    networks:
+        - kafka-net
+    command: /pingpong kafka1:19092 pinger ping pong
+  ponger:
+    image: ${MYHUB}/yglcode/pingpong:kafka
+    networks:
+        - kafka-net
+    command: /pingpong kafka1:19092 ponger pong ping
+
+networks:
+    kafka-net:
+       external: true
