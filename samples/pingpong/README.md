@@ -25,6 +25,8 @@ Sample ping-pong app for bouncing msgs thru Kafka topic
 
    swarm: docker stack deploy -c docker-compose.kafka.yml kafka-cluster
 
+   create topic "ping" & "pong" with as many partitions as max number of pinger and ponger
+   
 7. bring up pinger & ponger:
 
    compose: docker-compose -f docker-compose.yml up -d
@@ -35,7 +37,7 @@ Sample ping-pong app for bouncing msgs thru Kafka topic
 
    compose: docker-compose -f docker-compose.yml logs -f
 
-   swarm:   docker service logs -f pingpong_pinger_1
+   swarm:   docker service logs -f pingpong_pinger
 
 9. scale pinger or ponger:
 
